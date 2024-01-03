@@ -8,14 +8,9 @@
 bool g_GameIsRunning = false;
 SDL_Window* g_Window = nullptr;
 SDL_Renderer* g_Renderer = nullptr;
+SDL_Texture* g_Texture = nullptr;
 
-bool g_RButtonWasPressed = false;
-bool g_GButtonWasPressed = false;
-bool g_BButtonWasPressed = false;
-
-unsigned char g_Red = 0;
-unsigned char g_Green = 0;
-unsigned char g_Blue = 0;
+unsigned int g_Framebuffer[WINDOW_WIDTH * WINDOW_HEIGHT] = {0};
 
 int main(){
 	if(!init()) return 1;
@@ -23,7 +18,6 @@ int main(){
 	
 	while(g_GameIsRunning){
 		handle_input();
-		simulate_world();
 		render_graphics();
 	}
 	quit();
@@ -36,18 +30,20 @@ bool init(){
 		return false;
 	}
 	
-	//you can add other SDL modules here, like SDL_Audio, TTF_Font, SDL_Image, etc
-	
 	g_GameIsRunning = true;
 	
 	return true;
 }
 
 void create_window(){
-	if((g_Window = SDL_CreateWindow(GAME_NAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_DEFAULT_WIDTH, WINDOW_DEFAULT_HEIGHT, SDL_WINDOW_SHOWN))) 
+	if((g_Window = SDL_CreateWindow(GAME_NAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN))) 
 		std::cout << SDL_GetError() << std::endl;
 	if((g_Renderer = SDL_CreateRenderer(g_Window, -1, SDL_RENDERER_ACCELERATED)))
 		std::cout << SDL_GetError() << std::endl;
+	g_Texture = SDL_CreateTexture(g_Renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, WINDOW_WIDTH, WINDOW_HEIGHT);
+	if(!g_Texture){
+		std::cout << SDL_GetError() << std::endl;
+	}
 }
 
 void handle_input(){
@@ -57,48 +53,60 @@ void handle_input(){
 		
 		//keyboard stuff
 		g_GameIsRunning = !keyboardState[SDL_SCANCODE_ESCAPE];
-		if(keyboardState[SDL_SCANCODE_R]){
-			g_RButtonWasPressed = true;
-			std::cout << "R = " << (int)g_Red << "\n";
-		}
-		if(keyboardState[SDL_SCANCODE_G]){
-			g_GButtonWasPressed = true;
-			std::cout << "G = " << (int)g_Green << "\n";
-		}
-		if(keyboardState[SDL_SCANCODE_B]){
-			g_BButtonWasPressed = true;
-			std::cout << "B = " << (int)g_Blue << "\n";
-		}
 		
 		//mouse stuff
-		if(e.type == SDL_MOUSEBUTTONDOWN){
-			std::cout << "Pressed mouse button\n";
-		}
-		if(e.type == SDL_MOUSEMOTION){
-			std::cout << "Moved mouse\n";
-		}
-		if(e.type == SDL_MOUSEWHEEL){
-			std::cout << "Moved mouse wheel\n";
-		}
 		if(e.type == SDL_QUIT){
 			g_GameIsRunning = false;
 		}
 	}
 }
 
-void simulate_world(){
-	if(g_RButtonWasPressed) g_Red++;
-    if(g_GButtonWasPressed) g_Green++;
-    if(g_BButtonWasPressed) g_Blue++;
-	g_RButtonWasPressed = false;
-	g_GButtonWasPressed = false;
-	g_BButtonWasPressed = false;
+void render_begin(){
+	SDL_SetRenderDrawColor(g_Renderer, 0, 0, 0, 255);
+}
+
+void render_end(){
+	SDL_UpdateTexture(g_Texture, NULL, g_Framebuffer, (int)(sizeof(unsigned int) * WINDOW_WIDTH));
+	SDL_RenderCopy(g_Renderer, g_Texture, NULL, NULL);
+	SDL_RenderPresent(g_Renderer);
+	SDL_RenderClear(g_Renderer);
 }
 
 void render_graphics(){
-	SDL_SetRenderDrawColor(g_Renderer, g_Red, g_Green, g_Blue, 255);
-	SDL_RenderClear(g_Renderer);
-	SDL_RenderPresent(g_Renderer);
+	render_begin();
+
+	draw_background(g_Framebuffer, 0x00FF0000);
+	draw_AABB(g_Framebuffer, 100, 100, 200, 200, 0x000000FF);
+	draw_AABB(g_Framebuffer, 150, 150, 250, 250, 0x00000000);
+
+	render_end();
+}
+
+void draw_background(unsigned int* framebuffer, unsigned int color){
+	for(int i = 0; i < WINDOW_HEIGHT; i++)
+		for (int j = 0; j < WINDOW_WIDTH; ++j)
+			draw_pixel(g_Framebuffer, j, i, color);
+}
+
+void draw_AABB(unsigned int* framebuffer, int minX, int minY, int maxX, int maxY, unsigned int color){
+	if(minX < 0) minX = 0;
+	if(minY < 0) minY = 0;
+	if(maxX < 0) maxX = 0;
+	if(maxY < 0) maxY = 0;
+	if(minX > WINDOW_WIDTH)  minX = WINDOW_WIDTH - 1;
+	if(minY > WINDOW_HEIGHT) minY = WINDOW_HEIGHT - 1;
+	if(maxX > WINDOW_HEIGHT) maxX = WINDOW_HEIGHT - 1;
+	if(maxY > WINDOW_WIDTH)  maxY = WINDOW_WIDTH - 1;
+
+	for (int i = minY; i < maxY; ++i){
+		for (int j = minX; j < maxX; ++j){
+			draw_pixel(g_Framebuffer, j, i, color);
+		}
+	}
+}
+
+void draw_pixel(unsigned int* framebuffer, int x, int y, unsigned int color){
+	if (x >= 0 && x < WINDOW_WIDTH && y >= 0 && y < WINDOW_HEIGHT) g_Framebuffer[WINDOW_WIDTH * y + x] = color;
 }
 
 void quit(){
