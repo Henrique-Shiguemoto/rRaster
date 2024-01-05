@@ -5,6 +5,8 @@
 
 #include "main.h"
 
+#include <math.h>
+
 bool g_GameIsRunning = false;
 SDL_Window* g_Window = nullptr;
 SDL_Renderer* g_Renderer = nullptr;
@@ -76,8 +78,7 @@ void render_graphics(){
 	render_begin();
 
 	draw_background(g_Framebuffer, 0x00FF0000);
-	draw_AABB(g_Framebuffer, 100, 100, 200, 200, 0x000000FF);
-	draw_AABB(g_Framebuffer, 150, 150, 250, 250, 0x00000000);
+	draw_AABB(g_Framebuffer, 100, 100, 200, 200, RRENDER_COLOR_BLACK);
 
 	render_end();
 }
@@ -89,18 +90,76 @@ void draw_background(unsigned int* framebuffer, unsigned int color){
 }
 
 void draw_AABB(unsigned int* framebuffer, int minX, int minY, int maxX, int maxY, unsigned int color){
-	if(minX < 0) minX = 0;
-	if(minY < 0) minY = 0;
-	if(maxX < 0) maxX = 0;
-	if(maxY < 0) maxY = 0;
-	if(minX > WINDOW_WIDTH)  minX = WINDOW_WIDTH - 1;
-	if(minY > WINDOW_HEIGHT) minY = WINDOW_HEIGHT - 1;
-	if(maxX > WINDOW_HEIGHT) maxX = WINDOW_HEIGHT - 1;
-	if(maxY > WINDOW_WIDTH)  maxY = WINDOW_WIDTH - 1;
+	minX = rrender_clamp(minX, 0, WINDOW_WIDTH - 1);
+	maxX = rrender_clamp(maxX, 0, WINDOW_WIDTH - 1);
+	minY = rrender_clamp(minY, 0, WINDOW_HEIGHT - 1);
+	maxY = rrender_clamp(maxY, 0, WINDOW_HEIGHT - 1);
 
 	for (int i = minY; i < maxY; ++i){
 		for (int j = minX; j < maxX; ++j){
 			draw_pixel(g_Framebuffer, j, i, color);
+		}
+	}
+}
+
+void draw_line(unsigned int* framebuffer, int x0, int y0, int x1, int y1, unsigned int color){
+	x0 = rrender_clamp(x0, 0, WINDOW_WIDTH - 1);
+	x1 = rrender_clamp(x1, 0, WINDOW_WIDTH - 1);
+	y0 = rrender_clamp(y0, 0, WINDOW_HEIGHT - 1);
+	y1 = rrender_clamp(y1, 0, WINDOW_HEIGHT - 1);
+
+	int dx = x1 - x0;
+	int dy = y1 - y0;
+	int cx = (dx > 0) ? 1 : -1;
+	int cy = (dy > 0) ? 1 : -1;
+
+	// vertical lines
+	if(dx == 0){
+		if(dy == 0) {
+			draw_pixel(framebuffer, x0, y0, color);
+			return;
+		}
+		
+		// we're deciding if we go up or down
+		// 		- if up,   then y1 is smaller than y0 (dy < 0), so we have to decrement y (cy = -1)
+		// 		- if down, then y1 is bigger  than y0 (dy > 0), so we have to increment y (cy = +1)
+		// also, we're multiplying the condition inequation by cy because we need to flip it when cy = -1
+		for (int y = y0; cy * y < cy * y1; y += cy) draw_pixel(framebuffer, x0, y, color);
+	}else if (rrender_abs(dy / dx) < 1){
+		// bresenham
+		float error = 0.5f;
+		float m = (float)dy / (float)dx; // rise over run
+
+		int start_x = x0;
+		int start_y = y0;
+		int dest_x = x1;
+
+		while(cx * start_x < cx * dest_x){
+			draw_pixel(framebuffer, start_x, start_y, color);
+			start_x += cx;
+			error += rrender_abs(m);
+			if(error >= 0.5f){
+				start_y += cy;
+				error -= 1.0f;
+			}
+		}
+	}else{
+		// bresenham
+		float error = 0.5f;
+		float m = (float)dx / (float)dy; // run over rise
+
+		int start_x = x0;
+		int start_y = y0;
+		int dest_x = x1;
+
+		while(cx * start_x < cx * dest_x){
+			draw_pixel(framebuffer, start_x, start_y, color);
+			start_y += cy;
+			error += rrender_abs(m);
+			if(error >= 0.5f){
+				start_x += cx;
+				error -= 1.0f;
+			}
 		}
 	}
 }
