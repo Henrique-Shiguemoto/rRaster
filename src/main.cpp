@@ -77,8 +77,7 @@ void render_end(){
 void render_graphics(){
 	render_begin();
 
-	draw_background(g_Framebuffer, 0x00FF0000);
-	draw_AABB(g_Framebuffer, 100, 100, 200, 200, RRENDER_COLOR_BLACK);
+	draw_background(g_Framebuffer, RRASTER_COLOR_BLUE);
 
 	render_end();
 }
@@ -90,10 +89,10 @@ void draw_background(unsigned int* framebuffer, unsigned int color){
 }
 
 void draw_AABB(unsigned int* framebuffer, int minX, int minY, int maxX, int maxY, unsigned int color){
-	minX = rrender_clamp(minX, 0, WINDOW_WIDTH - 1);
-	maxX = rrender_clamp(maxX, 0, WINDOW_WIDTH - 1);
-	minY = rrender_clamp(minY, 0, WINDOW_HEIGHT - 1);
-	maxY = rrender_clamp(maxY, 0, WINDOW_HEIGHT - 1);
+	minX = RRASTER_CLAMP(minX, 0, WINDOW_WIDTH - 1);
+	maxX = RRASTER_CLAMP(maxX, 0, WINDOW_WIDTH - 1);
+	minY = RRASTER_CLAMP(minY, 0, WINDOW_HEIGHT - 1);
+	maxY = RRASTER_CLAMP(maxY, 0, WINDOW_HEIGHT - 1);
 
 	for (int i = minY; i < maxY; ++i){
 		for (int j = minX; j < maxX; ++j){
@@ -103,10 +102,10 @@ void draw_AABB(unsigned int* framebuffer, int minX, int minY, int maxX, int maxY
 }
 
 void draw_line(unsigned int* framebuffer, int x0, int y0, int x1, int y1, unsigned int color){
-	x0 = rrender_clamp(x0, 0, WINDOW_WIDTH - 1);
-	x1 = rrender_clamp(x1, 0, WINDOW_WIDTH - 1);
-	y0 = rrender_clamp(y0, 0, WINDOW_HEIGHT - 1);
-	y1 = rrender_clamp(y1, 0, WINDOW_HEIGHT - 1);
+	x0 = RRASTER_CLAMP(x0, 0, WINDOW_WIDTH - 1);
+	x1 = RRASTER_CLAMP(x1, 0, WINDOW_WIDTH - 1);
+	y0 = RRASTER_CLAMP(y0, 0, WINDOW_HEIGHT - 1);
+	y1 = RRASTER_CLAMP(y1, 0, WINDOW_HEIGHT - 1);
 
 	int dx = x1 - x0;
 	int dy = y1 - y0;
@@ -125,7 +124,7 @@ void draw_line(unsigned int* framebuffer, int x0, int y0, int x1, int y1, unsign
 		// 		- if down, then y1 is bigger  than y0 (dy > 0), so we have to increment y (cy = +1)
 		// also, we're multiplying the condition inequation by cy because we need to flip it when cy = -1
 		for (int y = y0; cy * y < cy * y1; y += cy) draw_pixel(framebuffer, x0, y, color);
-	}else if (rrender_abs(dy / dx) < 1){
+	}else if (RRASTER_ABS(dy / dx) < 1){
 		// bresenham
 		float error = 0.5f;
 		float m = (float)dy / (float)dx; // rise over run
@@ -137,7 +136,7 @@ void draw_line(unsigned int* framebuffer, int x0, int y0, int x1, int y1, unsign
 		while(cx * start_x < cx * dest_x){
 			draw_pixel(framebuffer, start_x, start_y, color);
 			start_x += cx;
-			error += rrender_abs(m);
+			error += RRASTER_ABS(m);
 			if(error >= 0.5f){
 				start_y += cy;
 				error -= 1.0f;
@@ -155,13 +154,50 @@ void draw_line(unsigned int* framebuffer, int x0, int y0, int x1, int y1, unsign
 		while(cx * start_x < cx * dest_x){
 			draw_pixel(framebuffer, start_x, start_y, color);
 			start_y += cy;
-			error += rrender_abs(m);
+			error += RRASTER_ABS(m);
 			if(error >= 0.5f){
 				start_x += cx;
 				error -= 1.0f;
 			}
 		}
 	}
+}
+
+void draw_circle(unsigned int* framebuffer, int cX, int cY, float radius, unsigned int color){
+	cX = RRASTER_CLAMP(cX, 0, WINDOW_WIDTH - 1);
+	cY = RRASTER_CLAMP(cY, 0, WINDOW_HEIGHT - 1);
+
+	// bresenham
+	int start_x = 0;
+	int start_y = -(int)radius;
+	float radius2 = radius * radius;
+
+	while(start_x <= -start_y){
+		draw_pixel(framebuffer,  start_x + cX,  start_y + cY, color);
+		draw_pixel(framebuffer,  start_x + cX, -start_y + cY, color);
+		draw_pixel(framebuffer, -start_x + cX,  start_y + cY, color);
+		draw_pixel(framebuffer, -start_x + cX, -start_y + cY, color);
+		draw_pixel(framebuffer,  start_y + cY,  start_x + cX, color);
+		draw_pixel(framebuffer, -start_y + cY,  start_x + cX, color);
+		draw_pixel(framebuffer,  start_y + cY, -start_x + cX, color);
+		draw_pixel(framebuffer, -start_y + cY, -start_x + cX, color);
+
+		start_x++;
+
+		float l2 = (float)(start_x * start_x) + (float)(start_y * start_y) - radius2;
+		float ld2 = (float)(start_x * start_x) + (float)((start_y + 1) * (start_y + 1)) - radius2;
+		float error_going_left = RRASTER_ABS(l2);
+		float error_going_left_and_down = RRASTER_ABS(ld2);
+		if(error_going_left_and_down < error_going_left){
+			start_y++;
+		}
+	}
+}
+
+void draw_triangle(unsigned int* framebuffer, int x0, int y0, int x1, int y1, int x2, int y2, unsigned int color){
+	draw_line(framebuffer, x0, y0, x1, y1, color);
+	draw_line(framebuffer, x0, y0, x2, y2, color);
+	draw_line(framebuffer, x1, y1, x2, y2, color);
 }
 
 void draw_pixel(unsigned int* framebuffer, int x, int y, unsigned int color){
