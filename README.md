@@ -13,7 +13,7 @@ Soon...
 - Color the window background
 - Render AABBs
 - Render lines (Bresenham's Line Algorithm, [source](https://youtu.be/y_SPO_b-WXk?si=SVX4SOGROpANxgFX))
-- Render circles (Bresenham's circle ouline Algorithm, [source](https://youtu.be/FTkO3ExDj3s?si=bIIEOSXufaHABDQi))
+- Render circles (Bresenham's circle ouline Algorithm, [source1](https://youtu.be/FTkO3ExDj3s?si=bIIEOSXufaHABDQi) and [source2](https://youtu.be/JtgQJT08J1g?si=K53YhH60jFwXi6FC))
 - Render Triangles
 
 ## Technologies Used
