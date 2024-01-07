@@ -1,6 +1,6 @@
 ## rRaster
 
-This is an SDL2 rasterizer in C++.
+This is an SDL2 rasterizer in C++, the idea is to maybe use this for game development or visualizing data in general.
 
 ## Screenshots
 
