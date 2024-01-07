@@ -36,7 +36,7 @@ everything: clean all
 
 # debugging BINARY_FILE
 .PHONY: debug
-debug: everything
+debug: $(BINARY_FILE)
 	$(DEBUGGER) $(BINARY_FILE)
 
 # clear unnecessary files

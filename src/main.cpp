@@ -60,12 +60,7 @@ void handle_input(){
 void render_graphics(){
 	g_Rasterizer->raster_begin();
 	g_Rasterizer->raster_background(RRASTER_COLOR_DARK_GRAY);
-	g_Rasterizer->raster_pixel(0, 0, RRASTER_COLOR_MAGENTA);
-	g_Rasterizer->raster_AABB(200, 210, 280, 270, RRASTER_COLOR_LIGHT_LIGHT_YELLOW);
-	g_Rasterizer->raster_AABB_filled(300, 310, 320, 330, RRASTER_COLOR_DARK_RED);
-	g_Rasterizer->raster_line(70, 120, 75, 478, RRASTER_COLOR_LIGHT_CYAN);
-	g_Rasterizer->raster_circle(WINDOW_WIDTH - 70, WINDOW_HEIGHT - 70, 33.0f, RRASTER_COLOR_GREEN);
-	g_Rasterizer->raster_triangle(120, 20, 32, 105, 495, 130, RRASTER_COLOR_BLACK);
+	g_Rasterizer->raster_line(1, 1, 3, 6, RRASTER_COLOR_BLACK);
 	g_Rasterizer->raster_end();
 }
 

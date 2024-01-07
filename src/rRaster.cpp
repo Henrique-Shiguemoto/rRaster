@@ -62,37 +62,39 @@ void rRaster::raster_line(int x0, int y0, int x1, int y1, unsigned int color){
 	}else if (RRASTER_ABS(dy / dx) < 1){
 		// bresenham
 		float error = 0.0f;
+		float threshold = 0.5f;
 		float m = (float)dy / (float)dx; // rise over run
 
 		int start_x = x0;
 		int start_y = y0;
 		int dest_x = x1;
 
-		while(cx * start_x < cx * dest_x){
+		while(cx * start_x <= cx * dest_x){
 			raster_pixel(start_x, start_y, color);
 			start_x += cx;
 			error += RRASTER_ABS(m);
-			if(error >= 0.5f){
+			if(error >= threshold){
 				start_y += cy;
-				error -= 1.0f;
+				threshold += 1.0f;
 			}
 		}
 	}else{
 		// bresenham
 		float error = 0.0f;
+		float threshold = 0.5f;
 		float m = (float)dx / (float)dy; // run over rise (this changed)
 
 		int start_x = x0;
 		int start_y = y0;
-		int dest_x = x1;
+		int dest_y = y1; // this changed
 
-		while(cx * start_x < cx * dest_x){
+		while(cy * start_y <= cy * dest_y){ //this changed
 			raster_pixel(start_x, start_y, color);
 			start_y += cy; // this changed
 			error += RRASTER_ABS(m);
-			if(error >= 0.5f){
+			if(error >= threshold){
 				start_x += cx; // this changed
-				error -= 1.0f;
+				threshold += 1.0f;
 			}
 		}
 	}
