@@ -101,7 +101,17 @@ void rRaster::raster_line(int x0, int y0, int x1, int y1, unsigned int color){
 }
 
 void rRaster::raster_circle_filled(int cX, int cY, float radius, unsigned int color){
-	
+	int dx = 2 * radius;
+	int dy = dx;
+
+	// translating to (0, 0) then translating to (cX, cY)
+	for (int y = -dy; y < dy; ++y){
+		for (int x = -dx; x < dx; ++x){
+			if(y * y + x * x <= radius * radius){
+				this->raster_pixel(x + cX, y + cY, color);
+			}
+		}
+	}
 }
 
 void rRaster::raster_circle(int cX, int cY, float radius, unsigned int color){
