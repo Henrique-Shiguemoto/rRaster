@@ -100,6 +100,10 @@ void rRaster::raster_line(int x0, int y0, int x1, int y1, unsigned int color){
 	}
 }
 
+void rRaster::raster_circle_filled(int cX, int cY, float radius, unsigned int color){
+	
+}
+
 void rRaster::raster_circle(int cX, int cY, float radius, unsigned int color){
 	// bresenham
 	int start_x = 0;
@@ -128,6 +132,23 @@ void rRaster::raster_circle(int cX, int cY, float radius, unsigned int color){
 	}
 }
 
+// based on: https://youtu.be/k5wtuKWmV48?si=3n6yzdB0qRcTjsqd
+void rRaster::raster_triangle_filled(int x0, int y0, int x1, int y1, int x2, int y2, unsigned int color){
+	int minX = RRASTER_MIN_3(x0, x1, x2);
+	int minY = RRASTER_MIN_3(y0, y1, y2);
+	int maxX = RRASTER_MAX_3(x0, x1, x2);
+	int maxY = RRASTER_MAX_3(y0, y1, y2);
+
+	for (int y = minY; y <= maxY; ++y){
+		for (int x = minX; x <= maxX; ++x){
+			if(this->point_inside_triangle(x, y, x0, y0, x1, y1, x2, y2)){
+				this->raster_pixel(x, y, color);
+			}
+		}
+	}
+
+}
+
 void rRaster::raster_triangle(int x0, int y0, int x1, int y1, int x2, int y2, unsigned int color){
 	raster_line(x0, y0, x1, y1, color);
 	raster_line(x0, y0, x2, y2, color);
@@ -147,4 +168,27 @@ void rRaster::raster_end(){
 	SDL_RenderCopy(this->renderer, this->texture, NULL, NULL);
 	SDL_RenderPresent(this->renderer);
 	SDL_RenderClear(this->renderer);
+}
+
+bool rRaster::point_inside_triangle(int px, int py, int x0, int y0, int x1, int y1, int x2, int y2){
+	int v0_v1_x = x1 - x0;
+	int v0_v1_y = y1 - y0;
+	int v0_p_x  = px - x0;
+	int v0_p_y  = py - y0;
+
+	int v1_v2_x = x2 - x1;
+	int v1_v2_y = y2 - y1;
+	int v1_p_x  = px - x1;
+	int v1_p_y  = py - y1;
+
+	int v2_v0_x = x0 - x2;
+	int v2_v0_y = y0 - y2;
+	int v2_p_x  = px - x2;
+	int v2_p_y  = py - y2;
+
+	bool p_is_to_the_right_of_v0_v1 = (v0_v1_x * v0_p_y - v0_p_x * v0_v1_y) <= 0;
+	bool p_is_to_the_right_of_v1_v2 = (v1_v2_x * v1_p_y - v1_p_x * v1_v2_y) <= 0;
+	bool p_is_to_the_right_of_v2_v0 = (v2_v0_x * v2_p_y - v2_p_x * v2_v0_y) <= 0;
+
+	return (p_is_to_the_right_of_v0_v1) && (p_is_to_the_right_of_v1_v2) && (p_is_to_the_right_of_v2_v0);
 }

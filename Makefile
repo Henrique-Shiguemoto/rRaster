@@ -16,7 +16,6 @@ DEBUGGER=gdb
 
 # build everything that needs to be built
 all: $(BINARY_FILE)
-	@echo "Compiling and Linking done..."
 
 $(BINARY_FILE): $(OBJECTS_FILES)
 	$(COMPILER) $(OBJECTS_FILES) -o $(BINARY_FILE) $(LIBRARY_PATH) $(LINKER_FLAGS)
@@ -32,7 +31,6 @@ run: $(BINARY_FILE)
 # build from scratch (cleans first)
 .PHONY: everything
 everything: clean all
-	@echo "Full Build Successful..."
 
 # debugging BINARY_FILE
 .PHONY: debug

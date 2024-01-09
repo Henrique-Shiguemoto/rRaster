@@ -60,7 +60,6 @@ void handle_input(){
 void render_graphics(){
 	g_Rasterizer->raster_begin();
 	g_Rasterizer->raster_background(RRASTER_COLOR_DARK_GRAY);
-	g_Rasterizer->raster_line(1, 1, 3, 6, RRASTER_COLOR_BLACK);
 	g_Rasterizer->raster_end();
 }
 

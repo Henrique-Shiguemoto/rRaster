@@ -8,29 +8,34 @@ class rRaster{
 public:
 	rRaster(SDL_Window* window, int context_width, int context_height);
 	~rRaster();
+	void raster_begin();
 	void raster_background(unsigned int color);
 	void raster_AABB(int minX, int minY, int maxX, int maxY, unsigned int color);
 	void raster_AABB_filled(int minX, int minY, int maxX, int maxY, unsigned int color);
 	void raster_line(int aX, int aY, int bX, int bY, unsigned int color);
+	void raster_circle_filled(int cX, int cY, float radius, unsigned int color);
 	void raster_circle(int cX, int cY, float radius, unsigned int color);
+	void raster_triangle_filled(int x0, int y0, int x1, int y1, int x2, int y2, unsigned int color);
 	void raster_triangle(int x0, int y0, int x1, int y1, int x2, int y2, unsigned int color);
 	void raster_pixel(int x, int y, unsigned int color);
-	void raster_begin();
 	void raster_end();
 
 	int raster_width;
 	int raster_height;
 
 private:
+	bool point_inside_triangle(int px, int py, int x0, int y0, int x1, int y1, int x2, int y2);
 	SDL_Renderer* renderer;
 	SDL_Texture* texture;
 	unsigned int* framebuffer;
 };
 
-#define RRASTER_MAX(a, b) 			(((a) > (b)) ? a : b)
-#define RRASTER_MIN(a, b) 			(((a) < (b)) ? a : b)
+#define RRASTER_MAX_2(a, b) 		(((a) > (b)) ? a : b)
+#define RRASTER_MAX_3(a, b, c) 		(RRASTER_MAX_2((a), (b)) > (c) ? RRASTER_MAX_2((a), (b)) : c)
+#define RRASTER_MIN_2(a, b) 		(((a) < (b)) ? a : b)
+#define RRASTER_MIN_3(a, b, c) 		(RRASTER_MIN_2((a), (b)) < (c) ? RRASTER_MIN_2((a), (b)) : c)
 #define RRASTER_ABS(a) 				(((a) < 0) ? (-a) : (a))
-#define RRASTER_CLAMP(x, min, max)  (RRASTER_MIN(RRASTER_MAX((x), (min)), (max)))
+#define RRASTER_CLAMP(x, min, max)  (RRASTER_MIN_2(RRASTER_MAX_2((x), (min)), (max)))
 
 // These are just here for convenience (the color format is 32bit - ABGR, in my machine at least)
 #define RRASTER_COLOR_LIGHT_LIGHT_RED		0x009191ff
