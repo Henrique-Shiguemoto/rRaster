@@ -7,9 +7,9 @@ LIBRARY_PATH=-Lsrc/lib
 
 # put all your source files here (put a space after each one to add another one)
 SOURCE_PATH=src
-SOURCE_FILES=$(SOURCE_PATH)/main.cpp $(SOURCE_PATH)/rRaster.cpp
+SOURCE_FILES=$(SOURCE_PATH)/main.cpp $(SOURCE_PATH)/rRaster.cpp $(SOURCE_PATH)/rmathlib.cpp
 BINARY_FILE=$(SOURCE_PATH)/game.exe
-OBJECTS_FILES=main.o rRaster.o
+OBJECTS_FILES=main.o rRaster.o rmathlib.o
 
 # I'm using gdb for simple stuff but certainly a front-end would be nice
 DEBUGGER=gdb

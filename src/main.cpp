@@ -4,6 +4,7 @@
 #include "SDL.h"
 
 #include "main.h"
+#include "rmathlib.h"
 
 #include "rRaster.h"
 
@@ -15,7 +16,7 @@ rRaster* g_Rasterizer = nullptr;
 int main(){
 	if(!init()) return 1;
 	create_window();
-	
+
 	g_Rasterizer = new rRaster(g_Window, WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	while(g_GameIsRunning){

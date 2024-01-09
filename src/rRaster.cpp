@@ -3,7 +3,7 @@
 rRaster::rRaster(SDL_Window* window, int context_width, int context_height){
 	this->raster_width = context_width;
 	this->raster_height = context_height;
-	this->renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	this->renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if(!this->renderer){
 		std::cout << SDL_GetError() << std::endl;
 	}
@@ -132,7 +132,6 @@ void rRaster::raster_circle(int cX, int cY, float radius, unsigned int color){
 	}
 }
 
-// based on: https://youtu.be/k5wtuKWmV48?si=3n6yzdB0qRcTjsqd
 void rRaster::raster_triangle_filled(int x0, int y0, int x1, int y1, int x2, int y2, unsigned int color){
 	int minX = RRASTER_MIN_3(x0, x1, x2);
 	int minY = RRASTER_MIN_3(y0, y1, y2);
