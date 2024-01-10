@@ -125,10 +125,10 @@ void rRaster::raster_circle(int cX, int cY, float radius, unsigned int color){
 		raster_pixel( start_x + cX, -start_y + cY, color);
 		raster_pixel(-start_x + cX,  start_y + cY, color);
 		raster_pixel(-start_x + cX, -start_y + cY, color);
-		raster_pixel( start_y + cY,  start_x + cX, color);
-		raster_pixel(-start_y + cY,  start_x + cX, color);
-		raster_pixel( start_y + cY, -start_x + cX, color);
-		raster_pixel(-start_y + cY, -start_x + cX, color);
+		raster_pixel( start_y + cX,  start_x + cY, color);
+		raster_pixel(-start_y + cX,  start_x + cY, color);
+		raster_pixel( start_y + cX, -start_x + cY, color);
+		raster_pixel(-start_y + cX, -start_x + cY, color);
 
 		start_x++;
 
