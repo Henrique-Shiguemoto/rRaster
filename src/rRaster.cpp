@@ -1,5 +1,8 @@
 #include "rRaster.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 rRaster::rRaster(SDL_Window* window, int context_width, int context_height){
 	this->raster_width = context_width;
 	this->raster_height = context_height;
@@ -8,7 +11,7 @@ rRaster::rRaster(SDL_Window* window, int context_width, int context_height){
 		std::cout << SDL_GetError() << std::endl;
 	}
 
-	this->texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, this->raster_width, this->raster_height);
+	this->texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING | SDL_TEXTUREACCESS_TARGET, this->raster_width, this->raster_height);
 	if(!this->texture){
 		std::cout << SDL_GetError() << std::endl;
 	}
@@ -17,6 +20,9 @@ rRaster::rRaster(SDL_Window* window, int context_width, int context_height){
 }
 
 rRaster::~rRaster(){
+	for (auto& _pair: this->surface_hashtable) {
+	    SDL_FreeSurface(_pair.second);
+	}
 	SDL_DestroyTexture(this->texture);
 	SDL_DestroyRenderer(this->renderer);
 	delete[] this->framebuffer;
@@ -39,6 +45,48 @@ void rRaster::raster_AABB_filled(int minX, int minY, int maxX, int maxY, unsigne
 	for (int i = minY; i < maxY; ++i)
 		for (int j = minX; j < maxX; ++j)
 			raster_pixel(j, i, color);
+}
+
+void rRaster::raster_image(std::string filepath, int x, int y){
+	// checking if this filepath is already cached, this right here is really the way to check for elements in a hashtable, really...
+	auto item = this->surface_hashtable.find(filepath);
+	if(item == this->surface_hashtable.end()){
+		if(!this->add_surface_to_surface_hashtable(filepath)){
+			return;
+		}
+	}
+
+	SDL_Surface* cached_surface = this->surface_hashtable[filepath];
+	int w = cached_surface->w;
+	int h = cached_surface->h;
+
+	for (int _y = 0; _y < h; ++_y) {
+		for (int _x = 0; _x < w; ++_x) {
+			unsigned int color = *((unsigned int*)cached_surface->pixels + (_y * w) + _x);
+			unsigned int a = (color & 0xFF000000) >> 24; // getting the alpha channel data only
+			if(a != 0){
+				// if alpha is zero, we'll assume the pixel is transparent
+				this->raster_pixel(x + _x, y + _y, color);
+			}
+		}
+	}
+}
+
+bool rRaster::add_surface_to_surface_hashtable(std::string filepath){
+	int width, height, nrComponents;
+    unsigned char *data = stbi_load(filepath.c_str(), &width, &height, &nrComponents, 0);
+    
+    if(data){
+    	// We can't free the data returned from stbi_load because SDL_CreateRGBSurfaceFrom just copies 
+    	//			the pointer from the first parameter (data) to the surface's pixels member, which means
+    	//			if we use stbi_image_free, we'll also be freeing the surface's pixels data
+    	SDL_Surface* surface = SDL_CreateRGBSurfaceFrom(data, width, height, 32, width * 4, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+    	this->surface_hashtable[filepath] = surface;
+    	return true;
+    }else{
+    	stbi_image_free(data);
+    	return false;
+    }
 }
 
 void rRaster::raster_line(int x0, int y0, int x1, int y1, unsigned int color){
@@ -170,13 +218,13 @@ void rRaster::raster_pixel(int x, int y, unsigned int color){
 
 void rRaster::raster_begin(){
 	SDL_SetRenderDrawColor(this->renderer, 0, 0, 0, 255);
+	SDL_RenderClear(this->renderer);
 }
 
 void rRaster::raster_end(){
 	SDL_UpdateTexture(this->texture, NULL, this->framebuffer, (int)(sizeof(unsigned int) * this->raster_width));
 	SDL_RenderCopy(this->renderer, this->texture, NULL, NULL);
 	SDL_RenderPresent(this->renderer);
-	SDL_RenderClear(this->renderer);
 }
 
 bool rRaster::point_inside_triangle(int px, int py, int x0, int y0, int x1, int y1, int x2, int y2){

@@ -61,6 +61,7 @@ void handle_input(){
 void render_graphics(){
 	g_Rasterizer->raster_begin();
 	g_Rasterizer->raster_background(RRASTER_COLOR_LIGHT_GRAY);
+	g_Rasterizer->raster_image("assets/imgs/blueSpaceship.png", WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
 	g_Rasterizer->raster_end();
 }
 

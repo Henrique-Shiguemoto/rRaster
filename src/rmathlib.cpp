@@ -525,7 +525,7 @@ double rm_sin64(double rad) {
 double rm_cos64(double rad) {
     //For precision purposes I want to make sure that rad is in a good interval
     //This interval for us is going to be [-PI/4, PI/4]
-    //(the bigger rad, the less precise our calculations are)
+    //(the bigger the rad, the less precise our calculations are)
     double angle = rm_mod64(rad, 2*RMATH_PI, RMATH_TRUE);
     
     if ((RMATH_PI < angle) && (angle < 2*RMATH_PI)) angle = -(2*RMATH_PI - angle);

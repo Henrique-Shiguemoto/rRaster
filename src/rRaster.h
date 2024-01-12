@@ -2,6 +2,9 @@
 #define RRASTER_H
 
 #include <iostream>
+#include <unordered_map>
+#include <string>
+
 #include "SDL.h"
 
 class rRaster{
@@ -12,6 +15,7 @@ public:
 	void raster_background(unsigned int color);
 	void raster_AABB(int minX, int minY, int maxX, int maxY, unsigned int color);
 	void raster_AABB_filled(int minX, int minY, int maxX, int maxY, unsigned int color);
+	void raster_image(std::string filepath, int x, int y);
 	void raster_line(int aX, int aY, int bX, int bY, unsigned int color);
 	void raster_circle_filled(int cX, int cY, float radius, unsigned int color);
 	void raster_circle(int cX, int cY, float radius, unsigned int color);
@@ -19,15 +23,17 @@ public:
 	void raster_triangle(int x0, int y0, int x1, int y1, int x2, int y2, unsigned int color);
 	void raster_pixel(int x, int y, unsigned int color);
 	void raster_end();
-
+	SDL_Renderer* renderer;
 	int raster_width;
 	int raster_height;
 
 private:
 	bool point_inside_triangle(int px, int py, int x0, int y0, int x1, int y1, int x2, int y2);
-	SDL_Renderer* renderer;
+	bool add_surface_to_surface_hashtable(std::string filepath);
+
 	SDL_Texture* texture;
 	unsigned int* framebuffer;
+	std::unordered_map<std::string, SDL_Surface*> surface_hashtable = {};
 };
 
 #define RRASTER_MAX_2(a, b) 		(((a) > (b)) ? a : b)
