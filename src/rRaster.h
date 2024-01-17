@@ -19,21 +19,24 @@ public:
 	void raster_line(int aX, int aY, int bX, int bY, unsigned int color);
 	void raster_circle_filled(int cX, int cY, float radius, unsigned int color);
 	void raster_circle(int cX, int cY, float radius, unsigned int color);
+	void raster_text(std::string text, int x, int y, unsigned int color);
 	void raster_triangle_filled(int x0, int y0, int x1, int y1, int x2, int y2, unsigned int color);
 	void raster_triangle(int x0, int y0, int x1, int y1, int x2, int y2, unsigned int color);
 	void raster_pixel(int x, int y, unsigned int color);
 	void raster_end();
-	SDL_Renderer* renderer;
-	int raster_width;
-	int raster_height;
 
 private:
 	bool point_inside_triangle(int px, int py, int x0, int y0, int x1, int y1, int x2, int y2);
 	bool add_surface_to_surface_hashtable(std::string filepath);
+	void calculate_row_and_column_offset_to_custom_font(char c, int* r_offset, int* c_offset);
+	// void raster_character(char c, int x, int y, unsigned int color);
 
 	SDL_Texture* texture;
 	unsigned int* framebuffer;
 	std::unordered_map<std::string, SDL_Surface*> surface_hashtable = {};
+	SDL_Renderer* renderer;
+	int raster_width;
+	int raster_height;
 };
 
 #define RRASTER_MAX_2(a, b) 		(((a) > (b)) ? a : b)

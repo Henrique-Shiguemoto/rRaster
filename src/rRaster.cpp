@@ -3,10 +3,12 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#include "../assets/fonts/custom_font.cpp"
+
 rRaster::rRaster(SDL_Window* window, int context_width, int context_height){
 	this->raster_width = context_width;
 	this->raster_height = context_height;
-	this->renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	this->renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if(!this->renderer){
 		std::cout << SDL_GetError() << std::endl;
 	}
@@ -186,6 +188,76 @@ void rRaster::raster_circle(int cX, int cY, float radius, unsigned int color){
 		float error_going_left_and_down = RRASTER_ABS(ld2);
 		if(error_going_left_and_down < error_going_left){
 			start_y++;
+		}
+	}
+}
+
+// This function assumes a monospaced bitmap font from the file custom_font.c
+void rRaster::raster_text(std::string text, int x, int y, unsigned int color){
+	int row_offset = 0;
+	int col_offset = 0;
+
+	unsigned int c_index = 0;
+	while(c_index < text.size()){
+		char current_char = text.at(c_index);
+
+		this->calculate_row_and_column_offset_to_custom_font(current_char, &row_offset, &col_offset);
+
+		for (int _y = 0; _y < CUSTOM_FONT_CHAR_HEIGHT; ++_y) {
+			for (int _x = 0; _x < CUSTOM_FONT_CHAR_WIDTH; ++_x) {
+				unsigned int p_color = custom_small_font[((row_offset * CUSTOM_FONT_CHAR_HEIGHT + _y) * CUSTOM_FONT_WIDTH_IN_PIXELS) + ((col_offset * CUSTOM_FONT_CHAR_WIDTH) + _x)]; // for now
+				unsigned int a = (p_color & 0xFF000000) >> 24; // getting the alpha channel data only
+				if(a != 0){
+					this->raster_pixel((x + (c_index * 6)) + _x, y + _y, color);
+				}
+			}
+		}
+
+		c_index++;
+	}
+}
+
+void rRaster::calculate_row_and_column_offset_to_custom_font(char c, int* r_offset, int* c_offset){
+	if('a' <= c && c <= 'z'){
+		*r_offset = 0;
+		*c_offset = static_cast<int>(c - 'a');
+	}else if('A' <= c && c <= 'Z'){
+		*r_offset = 1;
+		*c_offset = static_cast<int>(c - 'A');
+	}else if('0' <= c && c <= '9'){
+		*r_offset = 2;
+		*c_offset = static_cast<int>(c - '0');
+	}else{
+		switch(c){
+			case '(': {*r_offset = 2; *c_offset = 10;} break;
+			case ')': {*r_offset = 2; *c_offset = 11;} break;
+			case ',': {*r_offset = 2; *c_offset = 12;} break;
+			case ';': {*r_offset = 2; *c_offset = 13;} break;
+			case '.': {*r_offset = 2; *c_offset = 14;} break;
+			case ':': {*r_offset = 2; *c_offset = 15;} break;
+			case '!': {*r_offset = 2; *c_offset = 16;} break;
+			case '?': {*r_offset = 2; *c_offset = 17;} break;
+			case '^': {*r_offset = 2; *c_offset = 18;} break;
+			case '#': {*r_offset = 2; *c_offset = 19;} break;
+			case '[': {*r_offset = 2; *c_offset = 20;} break;
+			case ']': {*r_offset = 2; *c_offset = 21;} break;
+			case '%': {*r_offset = 2; *c_offset = 22;} break;
+			case '/': {*r_offset = 2; *c_offset = 23;} break;
+			case '\\': {*r_offset = 2; *c_offset = 24;} break;
+			case '$': {*r_offset = 2; *c_offset = 25;} break;
+			case '+': {*r_offset = 3; *c_offset = 0;} break;
+			case '-': {*r_offset = 3; *c_offset = 1;} break;
+			case '*': {*r_offset = 3; *c_offset = 2;} break;
+			case '=': {*r_offset = 3; *c_offset = 4;} break;
+			case '_': {*r_offset = 3; *c_offset = 5;} break;
+			case '\'': {*r_offset = 3; *c_offset = 6;} break;
+			case '\"': {*r_offset = 3; *c_offset = 7;} break;
+			case '<': {*r_offset = 3; *c_offset = 8;} break;
+			case '>': {*r_offset = 3; *c_offset = 9;} break;
+			case '&': {*r_offset = 3; *c_offset = 12;} break;
+			case '~': {*r_offset = 3; *c_offset = 13;} break;
+			case ' ': {*r_offset = 3; *c_offset = 14;} break;
+			default:  {*r_offset = 3; *c_offset = 15;} break;
 		}
 	}
 }
