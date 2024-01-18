@@ -5,8 +5,8 @@ This is an SDL2 rasterizer in C++, the idea is to maybe use this for game protot
 ## Screenshots
 
 <p float="left">
-  <img src="readme_imgs/showcase.png" width="350" height="365">
-  <img src="readme_imgs/showcase1.png" width="350" height="365">
+  <img src="readme_imgs/showcase.png" width="390" height="405">
+  <img src="readme_imgs/showcase1.png" width="390" height="405">
 </p>
 
 ## Features
