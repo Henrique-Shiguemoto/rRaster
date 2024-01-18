@@ -1,4 +1,4 @@
-## rRaster
+# rRaster
 
 This is an SDL2 rasterizer in C++, the idea is to maybe use this for game prototyping or visualizing data in general. See main.cpp (in the function <code>render_graphics</code>) for some sample code.
 
