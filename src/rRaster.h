@@ -14,7 +14,7 @@ public:
 	void raster_begin();
 	void raster_background(unsigned int color);
 	void raster_AABB(int minX, int minY, int maxX, int maxY, unsigned int color);
-	void raster_AABB_filled(int minX, int minY, int maxX, int maxY, unsigned int color);
+	void raster_AABB_filled(int x0, int y0, int x1, int y1, unsigned int color);
 	void raster_image(std::string filepath, int x, int y);
 	void raster_line(int aX, int aY, int bX, int bY, unsigned int color);
 	void raster_circle_filled(int cX, int cY, float radius, unsigned int color);
@@ -29,7 +29,6 @@ private:
 	bool point_inside_triangle(int px, int py, int x0, int y0, int x1, int y1, int x2, int y2);
 	bool add_surface_to_surface_hashtable(std::string filepath);
 	void calculate_row_and_column_offset_to_custom_font(char c, int* r_offset, int* c_offset);
-	// void raster_character(char c, int x, int y, unsigned int color);
 
 	SDL_Texture* texture;
 	unsigned int* framebuffer;

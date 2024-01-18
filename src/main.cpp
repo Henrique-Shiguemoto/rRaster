@@ -75,15 +75,32 @@ void handle_input(){
 void render_graphics(){
 	g_Rasterizer->raster_begin();
 	
-	g_Rasterizer->raster_background(RRASTER_COLOR_LIGHT_GRAY);
+	g_Rasterizer->raster_background(RRASTER_COLOR_DARK_BLUE);
+
+	int health_bar_width = 150;
+	int health_bar_height = 25;
+	g_Rasterizer->raster_AABB_filled(25, WINDOW_HEIGHT - 15, 25 + health_bar_width, WINDOW_HEIGHT - 15 - health_bar_height, RRASTER_COLOR_BLACK);
+	g_Rasterizer->raster_AABB_filled(28, WINDOW_HEIGHT - 18, 22 + health_bar_width, WINDOW_HEIGHT - 12 - health_bar_height, RRASTER_COLOR_LIGHT_GREEN);
+	g_Rasterizer->raster_text("Health: 100%", 32, WINDOW_HEIGHT - 32, RRASTER_COLOR_BLACK);
+
+	g_Rasterizer->raster_image("assets/imgs/greenEllipses.png", WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 + 40);
+	g_Rasterizer->raster_image("assets/imgs/greenEllipses.png", WINDOW_WIDTH / 2 + 10, WINDOW_HEIGHT / 2 + 80);
+	g_Rasterizer->raster_image("assets/imgs/greenEllipses.png", WINDOW_WIDTH / 2 + 16, WINDOW_HEIGHT / 2 + 120);
+	g_Rasterizer->raster_image("assets/imgs/purpleSpaceship.png", WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 + 180);
+
+	g_Rasterizer->raster_circle((WINDOW_WIDTH / 2) - 120, 40, 15.0f, RRASTER_COLOR_YELLOW);
+	g_Rasterizer->raster_circle((WINDOW_WIDTH / 2) + 20, 70, 35.0f, RRASTER_COLOR_YELLOW);
+	g_Rasterizer->raster_circle((WINDOW_WIDTH / 2) + 170, 120, 27.0f, RRASTER_COLOR_YELLOW);
+	g_Rasterizer->raster_circle((WINDOW_WIDTH / 2) - 220, 270, 5.0f, RRASTER_COLOR_YELLOW);
+	g_Rasterizer->raster_circle((WINDOW_WIDTH / 2) - 110, 220, 18.0f, RRASTER_COLOR_YELLOW);
 
 	if(g_DebugInfoIsShowing){
 		char debug_string[256] = "";
 		snprintf(debug_string, 256, "FPS: %lf", 1000.0 / g_perf.delta_time);
-		g_Rasterizer->raster_text(debug_string, 10, 10, RRASTER_COLOR_RED);
+		g_Rasterizer->raster_text(debug_string, 10, 10, RRASTER_COLOR_WHITE);
 		
 		snprintf(debug_string, 256, "Frame Count: %lu", g_perf.framecount);
-		g_Rasterizer->raster_text(debug_string, 10, 20, RRASTER_COLOR_RED);
+		g_Rasterizer->raster_text(debug_string, 10, 20, RRASTER_COLOR_WHITE);
 	}
 	
 	g_Rasterizer->raster_end();

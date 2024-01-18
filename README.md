@@ -1,10 +1,13 @@
 ## rRaster
 
-This is an SDL2 rasterizer in C++, the idea is to maybe use this for game prototyping or visualizing data in general.
+This is an SDL2 rasterizer in C++, the idea is to maybe use this for game prototyping or visualizing data in general. See main.cpp (in the function <code>render_graphics</code>) for some sample code.
 
 ## Screenshots
 
-Soon...
+<p float="left">
+  <img src="readme_imgs/showcase.png" width="450" height="465">
+  <img src="readme_imgs/showcase1.png" width="450" height="465">
+</p>
 
 ## Features
 
@@ -18,14 +21,15 @@ Soon...
 - Render Images (with [stb_image.h](https://github.com/nothings/stb/blob/master/stb_image.h))
 - Render Text (custom font, see <code>6x7_custom_font.png</code> in assets/fonts folder)
 
-## Technologies Used
-
-- C++11
-- Makefiles
-- SDL2
-
 ## How To Use
 
 - Just clone this repo wherever you want.
 - Open the command prompt on the cloned directory.
 - Type <code>make run</code> and hit Enter.
+
+## Technologies Used
+
+- C++11
+- Makefiles
+- SDL2
+- stb_image.h (for image loading)

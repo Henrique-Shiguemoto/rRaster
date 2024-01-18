@@ -43,7 +43,11 @@ void rRaster::raster_AABB(int minX, int minY, int maxX, int maxY, unsigned int c
 	raster_line(minX, maxY, minX, minY, color);
 }
 
-void rRaster::raster_AABB_filled(int minX, int minY, int maxX, int maxY, unsigned int color){
+void rRaster::raster_AABB_filled(int x0, int y0, int x1, int y1, unsigned int color){
+	int minX = RRASTER_MIN_2(x0, x1);
+	int maxX = RRASTER_MAX_2(x0, x1);
+	int minY = RRASTER_MIN_2(y0, y1);
+	int maxY = RRASTER_MAX_2(y0, y1);
 	for (int i = minY; i < maxY; ++i)
 		for (int j = minX; j < maxX; ++j)
 			raster_pixel(j, i, color);
