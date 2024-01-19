@@ -40,4 +40,5 @@ debug: $(BINARY_FILE)
 # clear unnecessary files
 .PHONY: clean
 clean:
+	# use rm instead of del if you're on Linux
 	del *.o *.exe *.s src\*.o src\*.exe src\*.s
