@@ -37,8 +37,7 @@ everything: clean all
 debug: $(BINARY_FILE)
 	$(DEBUGGER) $(BINARY_FILE)
 
-# clear unnecessary files
+# clear unnecessary files (# use rm instead of del if you're on Linux)
 .PHONY: clean
 clean:
-	# use rm instead of del if you're on Linux
 	del *.o *.exe *.s src\*.o src\*.exe src\*.s
